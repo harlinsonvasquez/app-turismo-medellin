@@ -1,17 +1,16 @@
-# app_turismo
+# App Turismo Medellín
 
-A new Flutter project.
+Aplicación desarrollada en Flutter que ayuda a turistas a descubrir planes, lugares y rutas optimizadas en Medellín y Antioquia según presupuesto, días de viaje y ubicación.
 
-## Getting Started
+## Funcionalidades
 
-This project is a starting point for a Flutter application.
+- Descubrimiento de lugares turísticos
+- Planificador de itinerarios
+- Recomendaciones de seguridad
+- Lugares cercanos según ubicación
 
-A few resources to get you started if this is your first Flutter project:
+## Tecnologías
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Flutter
+- Dart
+- GoRouter
