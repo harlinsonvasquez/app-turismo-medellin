@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:app_turismo/core/theme/app_theme.dart';
+
 import 'package:app_turismo/core/constants/app_constants.dart';
-import 'package:app_turismo/data/mock/mock_places.dart';
+import 'package:app_turismo/core/theme/app_theme.dart';
 import 'package:app_turismo/data/models/place_model.dart';
-import 'package:app_turismo/presentation/widgets/place_card.dart';
+import 'package:app_turismo/presentation/providers/event_provider.dart';
+import 'package:app_turismo/presentation/providers/place_provider.dart';
 import 'package:app_turismo/presentation/widgets/common_widgets.dart';
+import 'package:app_turismo/presentation/widgets/event_card.dart';
+import 'package:app_turismo/presentation/widgets/place_card.dart';
+import 'package:app_turismo/shared/app_catalog.dart';
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({super.key});
@@ -17,185 +22,170 @@ class DiscoverScreen extends StatefulWidget {
 class _DiscoverScreenState extends State<DiscoverScreen> {
   String _selectedCategory = 'Todos';
   String _selectedBudget = 'Cualquier presupuesto';
-  bool _onlyOpen = false;
   bool _safeZoneOnly = false;
   bool _isGridView = false;
+  final _searchController = TextEditingController();
 
-  final List<String> _categories = [
-    'Todos',
-    'Hoteles',
-    'Restaurantes',
-    'Turismo',
-    'Vida Nocturna',
-    'Pueblos',
-    'Experiencias',
-  ];
+  final List<String> _categories = ['Todos', 'Hoteles', 'Restaurantes', 'Turismo', 'Eventos', 'Vida Nocturna', 'Pueblos', 'Experiencias'];
+  final List<String> _budgets = ['Cualquier presupuesto', 'Economico', 'Moderado', 'Premium'];
 
-  final List<String> _budgets = [
-    'Cualquier presupuesto',
-    'Económico',
-    'Moderado',
-    'Premium',
-    'Lujo',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _reload());
+  }
 
-  List<PlaceModel> get _filteredPlaces {
-    return MockPlaces.all.where((p) {
-      if (_selectedCategory != 'Todos') {
-        final catMap = {
-          'Hoteles': PlaceCategory.hotel,
-          'Restaurantes': PlaceCategory.restaurant,
-          'Turismo': PlaceCategory.touristPlace,
-          'Vida Nocturna': PlaceCategory.nightlife,
-          'Pueblos': PlaceCategory.town,
-          'Experiencias': PlaceCategory.experience,
-        };
-        if (catMap[_selectedCategory] != p.category) return false;
-      }
-      if (_onlyOpen && !p.isOpenNow) return false;
-      if (_safeZoneOnly && p.safetyLevel != SafetyLevel.safe) return false;
-      return true;
-    }).toList();
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  bool get _showEvents => _selectedCategory == 'Eventos';
+
+  Future<void> _reload() async {
+    if (_showEvents) {
+      await context.read<EventProvider>().loadEvents(query: {'city': 'Medellin', 'featured': true});
+      return;
+    }
+
+    final query = <String, dynamic>{'city': 'Medellin'};
+    final category = AppCatalog.mapPlaceCategoryLabel(_selectedCategory);
+    if (category != null) query['category'] = AppCatalog.placeCategoryToApi(category);
+    if (_safeZoneOnly) query['safeZone'] = true;
+    if (_searchController.text.trim().isNotEmpty) query['search'] = _searchController.text.trim();
+
+    switch (_selectedBudget) {
+      case 'Economico':
+        query['maxPrice'] = 50000;
+        break;
+      case 'Moderado':
+        query['maxPrice'] = 120000;
+        break;
+      case 'Premium':
+        query['minPrice'] = 120000;
+        break;
+      case 'Cualquier presupuesto':
+        break;
+    }
+
+    await context.read<PlaceProvider>().loadPlaces(query: query);
   }
 
   @override
   Widget build(BuildContext context) {
+    final placeProvider = context.watch<PlaceProvider>();
+    final eventProvider = context.watch<EventProvider>();
+    final places = placeProvider.places;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Explorar'),
         actions: [
-          IconButton(
-            icon: Icon(
-                _isGridView ? Icons.view_list_rounded : Icons.grid_view_rounded),
-            onPressed: () => setState(() => _isGridView = !_isGridView),
-          ),
+          if (!_showEvents)
+            IconButton(
+              icon: Icon(_isGridView ? Icons.view_list_rounded : Icons.grid_view_rounded),
+              onPressed: () => setState(() => _isGridView = !_isGridView),
+            ),
         ],
       ),
       body: Column(
         children: [
-          // Search bar
-          const Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: AppConstants.paddingM,
-                vertical: AppConstants.paddingS),
-            child: AppSearchBar(hint: 'Buscar en Medellín y Antioquia...'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM, vertical: AppConstants.paddingS),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Buscar en Medellin y Antioquia...',
+                prefixIcon: const Icon(Icons.search_rounded),
+                suffixIcon: IconButton(icon: const Icon(Icons.tune_rounded), onPressed: _reload),
+              ),
+              onSubmitted: (_) => _reload(),
+            ),
           ),
-          // Category chips
           SizedBox(
             height: 44,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(
-                  horizontal: AppConstants.paddingM),
+              padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
               itemCount: _categories.length,
               itemBuilder: (_, i) => Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: AppChip(
                   label: _categories[i],
                   isSelected: _selectedCategory == _categories[i],
-                  onTap: () =>
-                      setState(() => _selectedCategory = _categories[i]),
+                  onTap: () {
+                    setState(() => _selectedCategory = _categories[i]);
+                    _reload();
+                  },
                 ),
               ),
             ),
           ),
           const SizedBox(height: 8),
-          // Filter row
           SizedBox(
             height: 42,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(
-                  horizontal: AppConstants.paddingM),
+              padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
               children: [
                 _FilterChip(
-                  label: _selectedBudget == 'Cualquier presupuesto'
-                      ? '💰 Presupuesto'
-                      : '💰 $_selectedBudget',
+                  label: _selectedBudget == 'Cualquier presupuesto' ? 'Presupuesto' : _selectedBudget,
                   isActive: _selectedBudget != 'Cualquier presupuesto',
                   onTap: () => _showBudgetSheet(context),
                 ),
                 const SizedBox(width: 8),
                 _FilterChip(
-                  label: '📏 Distancia',
-                  isActive: false,
-                  onTap: () {},
-                ),
-                const SizedBox(width: 8),
-                _FilterChip(
-                  label: '⏰ Abierto ahora',
-                  isActive: _onlyOpen,
-                  onTap: () => setState(() => _onlyOpen = !_onlyOpen),
-                ),
-                const SizedBox(width: 8),
-                _FilterChip(
-                  label: '🛡️ Zona segura',
+                  label: 'Zona segura',
                   isActive: _safeZoneOnly,
-                  onTap: () =>
-                      setState(() => _safeZoneOnly = !_safeZoneOnly),
+                  onTap: () {
+                    setState(() => _safeZoneOnly = !_safeZoneOnly);
+                    _reload();
+                  },
                 ),
               ],
             ),
           ),
           const SizedBox(height: 8),
-          // Results count
           Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: AppConstants.paddingM, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM, vertical: 4),
             child: Row(
               children: [
                 Text(
-                  '${_filteredPlaces.length} resultados',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  _showEvents ? '${eventProvider.events.length} eventos' : '${places.length} resultados',
+                  style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
                 ),
                 const Spacer(),
-                TextButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.sort_rounded, size: 16),
-                  label: const Text('Ordenar'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    textStyle: const TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.w600),
-                    padding: EdgeInsets.zero,
+                if (placeProvider.error != null || eventProvider.error != null)
+                  Expanded(
+                    child: Text(
+                      placeProvider.error ?? eventProvider.error ?? '',
+                      textAlign: TextAlign.end,
+                      style: const TextStyle(fontSize: 12, color: AppColors.error),
+                    ),
                   ),
-                ),
               ],
             ),
           ),
-          // Results
-          Expanded(
-            child: _isGridView
-                ? _buildGrid(context)
-                : _buildList(context),
-          ),
+          Expanded(child: _showEvents ? _buildEvents(eventProvider) : (_isGridView ? _buildGrid(context, places) : _buildList(context, places))),
         ],
       ),
     );
   }
 
-  Widget _buildList(BuildContext context) {
-    final places = _filteredPlaces;
+  Widget _buildList(BuildContext context, List<PlaceModel> places) {
+    if (context.watch<PlaceProvider>().isLoading) return const Center(child: CircularProgressIndicator());
     if (places.isEmpty) return _buildEmpty();
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
       itemCount: places.length,
-      itemBuilder: (_, i) => PlaceCard(
-        place: places[i],
-        isHorizontal: true,
-        onTap: () => context.go(
-            '${AppConstants.routePlaceDetail}?id=${places[i].id}'),
-      ),
+      itemBuilder: (_, i) => PlaceCard(place: places[i], isHorizontal: true, onTap: () => context.go('${AppConstants.routePlaceDetail}?id=${places[i].id}')),
     );
   }
 
-  Widget _buildGrid(BuildContext context) {
-    final places = _filteredPlaces;
+  Widget _buildGrid(BuildContext context, List<PlaceModel> places) {
+    if (context.watch<PlaceProvider>().isLoading) return const Center(child: CircularProgressIndicator());
     if (places.isEmpty) return _buildEmpty();
     return GridView.builder(
       padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
@@ -206,10 +196,19 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         childAspectRatio: 0.72,
       ),
       itemCount: places.length,
-      itemBuilder: (_, i) => PlaceCard(
-        place: places[i],
-        onTap: () => context.go(
-            '${AppConstants.routePlaceDetail}?id=${places[i].id}'),
+      itemBuilder: (_, i) => PlaceCard(place: places[i], onTap: () => context.go('${AppConstants.routePlaceDetail}?id=${places[i].id}')),
+    );
+  }
+
+  Widget _buildEvents(EventProvider provider) {
+    if (provider.isLoading) return const Center(child: CircularProgressIndicator());
+    if (provider.events.isEmpty) return _buildEmpty();
+    return ListView.builder(
+      padding: const EdgeInsets.all(AppConstants.paddingM),
+      itemCount: provider.events.length,
+      itemBuilder: (_, index) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: SizedBox(height: 190, child: EventCard(event: provider.events[index])),
       ),
     );
   }
@@ -219,21 +218,11 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('🔍', style: TextStyle(fontSize: 64)),
+          Icon(Icons.search_off_rounded, size: 64, color: AppColors.textTertiary),
           SizedBox(height: 16),
-          Text(
-            'Sin resultados',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
-            ),
-          ),
+          Text('Sin resultados', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
           SizedBox(height: 8),
-          Text(
-            'Intenta con otros filtros',
-            style: TextStyle(color: AppColors.textTertiary),
-          ),
+          Text('Intenta con otros filtros', style: TextStyle(color: AppColors.textTertiary)),
         ],
       ),
     );
@@ -242,30 +231,22 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   void _showBudgetSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-            top: Radius.circular(AppConstants.radiusXXL)),
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppConstants.radiusXXL))),
       builder: (_) => Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.all(20),
-            child: Text(
-              'Filtrar por presupuesto',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            child: Text('Filtrar por presupuesto', style: Theme.of(context).textTheme.headlineSmall),
           ),
-          ..._budgets.map((b) => ListTile(
-                title: Text(b),
-                trailing: _selectedBudget == b
-                    ? const Icon(Icons.check_circle,
-                        color: AppColors.primary)
-                    : null,
+          ..._budgets.map((budget) => ListTile(
+                title: Text(budget),
+                trailing: _selectedBudget == budget ? const Icon(Icons.check_circle, color: AppColors.primary) : null,
                 onTap: () {
-                  setState(() => _selectedBudget = b);
+                  setState(() => _selectedBudget = budget);
                   Navigator.pop(context);
+                  _reload();
                 },
               )),
           const SizedBox(height: 20),
@@ -280,11 +261,7 @@ class _FilterChip extends StatelessWidget {
   final bool isActive;
   final VoidCallback onTap;
 
-  const _FilterChip({
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-  });
+  const _FilterChip({required this.label, required this.isActive, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -295,18 +272,11 @@ class _FilterChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: isActive ? AppColors.primary : AppColors.surface,
           borderRadius: BorderRadius.circular(AppConstants.radiusFull),
-          border: Border.all(
-            color: isActive ? AppColors.primary : AppColors.divider,
-            width: 1.5,
-          ),
+          border: Border.all(color: isActive ? AppColors.primary : AppColors.divider, width: 1.5),
         ),
         child: Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: isActive ? Colors.white : AppColors.textPrimary,
-          ),
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isActive ? Colors.white : AppColors.textPrimary),
         ),
       ),
     );

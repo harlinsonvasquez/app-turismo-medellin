@@ -2,28 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  // Primary palette
-  static const Color primary = Color(0xFF1A5F7A);       // Deep teal-blue
-  static const Color primaryDark = Color(0xFF0D3A4F);   // Darker teal
-  static const Color primaryLight = Color(0xFF2E8BC0);  // Lighter teal
-  static const Color secondary = Color(0xFF2ECC71);     // Fresh green
-  static const Color secondaryDark = Color(0xFF1A9E50); // Deeper green
-  static const Color accent = Color(0xFFF39C12);        // Warm amber
-  static const Color accentLight = Color(0xFFF9B942);   // Light amber
+  static const Color primary = Color(0xFF1A5F7A);
+  static const Color primaryDark = Color(0xFF0D3A4F);
+  static const Color primaryLight = Color(0xFF2E8BC0);
+  static const Color secondary = Color(0xFF2ECC71);
+  static const Color secondaryDark = Color(0xFF1A9E50);
+  static const Color accent = Color(0xFFF39C12);
+  static const Color accentLight = Color(0xFFF9B942);
 
-  // Neutrals
   static const Color background = Color(0xFFF8F9FA);
   static const Color surface = Color(0xFFFFFFFF);
   static const Color surfaceVariant = Color(0xFFF1F4F8);
   static const Color divider = Color(0xFFE8ECF0);
 
-  // Text
   static const Color textPrimary = Color(0xFF1A1D2E);
   static const Color textSecondary = Color(0xFF6B7280);
   static const Color textTertiary = Color(0xFF9CA3AF);
   static const Color textOnPrimary = Color(0xFFFFFFFF);
 
-  // Status
   static const Color success = Color(0xFF2ECC71);
   static const Color warning = Color(0xFFF39C12);
   static const Color error = Color(0xFFE74C3C);
@@ -31,28 +27,28 @@ class AppColors {
   static const Color cautionZone = Color(0xFFF39C12);
   static const Color dangerZone = Color(0xFFE74C3C);
 
-  // Gradient endpoints
   static const Color gradientStart = Color(0xFF1A5F7A);
   static const Color gradientEnd = Color(0xFF2E8BC0);
   static const Color heroGradientStart = Color(0x00000000);
   static const Color heroGradientEnd = Color(0xCC000000);
 
-  // Night/Dark mode accents
   static const Color night = Color(0xFF1A1D2E);
   static const Color nightAccent = Color(0xFF6C63FF);
 }
 
 class AppTheme {
   static ThemeData get lightTheme {
-    final colorScheme = ColorScheme.fromSeed(
+    final baseScheme = ColorScheme.fromSeed(
       seedColor: AppColors.primary,
       brightness: Brightness.light,
+    );
+
+    final colorScheme = baseScheme.copyWith(
       primary: AppColors.primary,
       onPrimary: AppColors.textOnPrimary,
       secondary: AppColors.secondary,
       onSecondary: AppColors.textOnPrimary,
       tertiary: AppColors.accent,
-      background: AppColors.background,
       surface: AppColors.surface,
       onSurface: AppColors.textPrimary,
       error: AppColors.error,
@@ -244,3 +240,4 @@ class AppTheme {
     );
   }
 }
+

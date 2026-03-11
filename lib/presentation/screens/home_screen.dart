@@ -1,108 +1,148 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:app_turismo/core/theme/app_theme.dart';
-import 'package:app_turismo/core/constants/app_constants.dart';
-import 'package:app_turismo/data/mock/mock_places.dart';
-import 'package:app_turismo/data/mock/mock_data.dart';
-import 'package:app_turismo/data/models/place_model.dart';
-import 'package:app_turismo/data/models/user_model.dart';
-import 'package:app_turismo/presentation/widgets/place_card.dart';
-import 'package:app_turismo/presentation/widgets/common_widgets.dart';
-import 'package:app_turismo/presentation/widgets/specialized_widgets.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+import 'package:app_turismo/core/constants/app_constants.dart';
+import 'package:app_turismo/core/theme/app_theme.dart';
+import 'package:app_turismo/presentation/providers/auth_provider.dart';
+import 'package:app_turismo/presentation/providers/event_provider.dart';
+import 'package:app_turismo/presentation/providers/place_provider.dart';
+import 'package:app_turismo/presentation/providers/safety_provider.dart';
+import 'package:app_turismo/presentation/widgets/common_widgets.dart';
+import 'package:app_turismo/presentation/widgets/event_card.dart';
+import 'package:app_turismo/presentation/widgets/place_card.dart';
+import 'package:app_turismo/presentation/widgets/specialized_widgets.dart';
+import 'package:app_turismo/shared/app_catalog.dart';
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<PlaceProvider>().loadPlaces(query: {'city': 'Medellin'});
+      context.read<EventProvider>().loadEvents(query: {'city': 'Medellin', 'featured': true});
+      context.read<SafetyProvider>().loadTips(city: 'Medellin');
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final placeProvider = context.watch<PlaceProvider>();
+    final eventProvider = context.watch<EventProvider>();
+    final safetyProvider = context.watch<SafetyProvider>();
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          _buildAppBar(context),
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                // Search bar
-                const AppSearchBar(),
-                const SizedBox(height: 20),
-                // Location card
-                _buildLocationCard(context),
-                const SizedBox(height: 24),
-                // Categories
-                SectionHeader(
-                  title: 'Explorar por categoría',
-                  subtitle: 'Medellín y Antioquia',
-                ),
-                const SizedBox(height: 12),
-                _buildCategories(context),
-                const SizedBox(height: 24),
-                // Featured experiences
-                SectionHeader(
-                  title: 'Experiencias destacadas',
-                  actionLabel: 'Ver todo',
-                  onAction: () {},
-                ),
-                const SizedBox(height: 12),
-                _buildFeaturedCarousel(context),
-                const SizedBox(height: 24),
-                // Safety tip banner
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppConstants.paddingM),
-                  child: SafetyTipBanner(
-                    tip: MockSafetyTips.all.first,
-                    compact: false,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await context.read<PlaceProvider>().loadPlaces(query: {'city': 'Medellin'});
+          await context.read<EventProvider>().loadEvents(query: {'city': 'Medellin', 'featured': true});
+          await context.read<SafetyProvider>().loadTips(city: 'Medellin');
+        },
+        child: CustomScrollView(
+          slivers: [
+            _buildAppBar(context, auth),
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  AppSearchBar(onTap: () => context.go(AppConstants.routeDiscover)),
+                  const SizedBox(height: 20),
+                  _buildLocationCard(),
+                  const SizedBox(height: 24),
+                  const SectionHeader(title: 'Explorar por categoria', subtitle: 'Medellin y Antioquia'),
+                  const SizedBox(height: 12),
+                  _buildCategories(context),
+                  const SizedBox(height: 24),
+                  SectionHeader(
+                    title: 'Experiencias destacadas',
+                    actionLabel: 'Ver todo',
+                    onAction: () => context.go(AppConstants.routeDiscover),
                   ),
-                ),
-                const SizedBox(height: 24),
-                // Plans by budget
-                SectionHeader(
-                  title: 'Planes por presupuesto',
-                  subtitle: 'Escoge tu viaje ideal',
-                  actionLabel: 'Crear plan',
-                  onAction: () => context.go(AppConstants.routePlanner),
-                ),
-                const SizedBox(height: 12),
-                _buildBudgetPlans(context),
-                const SizedBox(height: 24),
-                // Popular this week
-                SectionHeader(
-                  title: '🔥 Popular esta semana',
-                  actionLabel: 'Ver todo',
-                  onAction: () {},
-                ),
-                const SizedBox(height: 12),
-                _buildPopularList(context),
-                const SizedBox(height: 24),
-                // Near you
-                SectionHeader(
-                  title: '📍 Cerca de ti',
-                  subtitle: 'El Poblado, Medellín',
-                  actionLabel: 'Ver mapa',
-                  onAction: () => context.go(AppConstants.routeNearby),
-                ),
-                const SizedBox(height: 12),
-                _buildNearby(context),
-                const SizedBox(height: 100),
-              ],
+                  const SizedBox(height: 12),
+                  if (placeProvider.isLoading)
+                    const SizedBox(height: 260, child: Center(child: CircularProgressIndicator()))
+                  else
+                    _buildFeaturedCarousel(context, placeProvider),
+                  const SizedBox(height: 24),
+                  if (safetyProvider.tips.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
+                      child: SafetyTipBanner(tip: safetyProvider.tips.first, compact: false),
+                    ),
+                  const SizedBox(height: 24),
+                  SectionHeader(
+                    title: 'Eventos destacados',
+                    subtitle: 'Agenda local real',
+                    actionLabel: 'Explorar',
+                    onAction: () => context.go(AppConstants.routeDiscover),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildEvents(eventProvider),
+                  const SizedBox(height: 24),
+                  SectionHeader(
+                    title: 'Planes por presupuesto',
+                    subtitle: 'Escoge tu viaje ideal',
+                    actionLabel: 'Crear plan',
+                    onAction: () => context.go(AppConstants.routePlanner),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildBudgetPlans(context),
+                  const SizedBox(height: 24),
+                  SectionHeader(
+                    title: 'Popular esta semana',
+                    actionLabel: 'Ver todo',
+                    onAction: () => context.go(AppConstants.routeDiscover),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildPopularList(context, placeProvider),
+                  const SizedBox(height: 24),
+                  SectionHeader(
+                    title: 'Cerca de ti',
+                    subtitle: 'El Poblado, Medellin',
+                    actionLabel: 'Ver mapa',
+                    onAction: () => context.go(AppConstants.routeNearby),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildNearby(context, placeProvider),
+                  if (placeProvider.error != null)
+                    Padding(
+                      padding: const EdgeInsets.all(AppConstants.paddingM),
+                      child: Text(placeProvider.error!, style: const TextStyle(color: AppColors.error)),
+                    ),
+                  const SizedBox(height: 100),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  SliverAppBar _buildAppBar(BuildContext context) {
-    final user = MockUser.mockUser;
+  SliverAppBar _buildAppBar(BuildContext context, AuthProvider auth) {
+    final userName = auth.user?.name.split(' ').first ?? 'viajero';
     return SliverAppBar(
       expandedHeight: 130,
       floating: true,
       snap: true,
       backgroundColor: AppColors.background,
       elevation: 0,
+      actions: [
+        IconButton(
+          onPressed: () => context.go(AppConstants.routeSaved),
+          icon: const Icon(Icons.bookmark_outline_rounded, color: Colors.white),
+        ),
+      ],
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
           padding: const EdgeInsets.fromLTRB(20, 56, 20, 12),
@@ -122,25 +162,17 @@ class HomeScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      '¡Hola, ${user.name.split(' ').first}! 👋',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      'Hola, $userName',
+                      style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 3),
-                    const Text(
-                      '¿A dónde vamos hoy?',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
+                    Text(
+                      auth.isAuthenticated ? 'Tu viaje ahora usa datos reales' : 'Explora Medellin con backend en vivo',
+                      style: const TextStyle(color: Colors.white70, fontSize: 14),
                     ),
                   ],
                 ),
               ),
-              // Profile avatar
               GestureDetector(
                 onTap: () => context.go(AppConstants.routeProfile),
                 child: Container(
@@ -151,9 +183,7 @@ class HomeScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 2),
                   ),
-                  child: const Center(
-                    child: Text('👤', style: TextStyle(fontSize: 22)),
-                  ),
+                  child: const Center(child: Text('??', style: TextStyle(fontSize: 22))),
                 ),
               ),
             ],
@@ -163,7 +193,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLocationCard(BuildContext context) {
+  Widget _buildLocationCard() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
       padding: const EdgeInsets.all(16),
@@ -171,11 +201,7 @@ class HomeScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppConstants.radiusL),
         boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
+          BoxShadow(color: AppColors.primary.withOpacity(0.08), blurRadius: 16, offset: const Offset(0, 4)),
         ],
       ),
       child: Row(
@@ -187,31 +213,16 @@ class HomeScreen extends StatelessWidget {
               color: AppColors.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(AppConstants.radiusM),
             ),
-            child: const Center(
-                child: Text('📍', style: TextStyle(fontSize: 24))),
+            child: const Center(child: Text('??', style: TextStyle(fontSize: 24))),
           ),
           const SizedBox(width: 12),
-          Expanded(
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Tu ubicación actual',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textTertiary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                const Text(
-                  'El Poblado, Medellín',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
+                Text('Base local configurada', style: TextStyle(fontSize: 12, color: AppColors.textTertiary, fontWeight: FontWeight.w500)),
+                SizedBox(height: 2),
+                Text('Medellin, Antioquia', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
               ],
             ),
           ),
@@ -221,14 +232,7 @@ class HomeScreen extends StatelessWidget {
               color: AppColors.safeZone.withOpacity(0.1),
               borderRadius: BorderRadius.circular(AppConstants.radiusFull),
             ),
-            child: const Text(
-              '✓ Zona segura',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.safeZone,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            child: const Text('Backend activo', style: TextStyle(fontSize: 12, color: AppColors.safeZone, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -240,50 +244,28 @@ class HomeScreen extends StatelessWidget {
       height: 100,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(
-            horizontal: AppConstants.paddingM),
-        itemCount: MockCategories.all.length,
+        padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
+        itemCount: AppCatalog.categories.length,
         itemBuilder: (_, i) {
-          final cat = MockCategories.all[i];
+          final cat = AppCatalog.categories[i];
           return GestureDetector(
-            onTap: () {},
-            child: Container(
+            onTap: () => context.go(AppConstants.routeDiscover),
+            child: SizedBox(
               width: 76,
-              margin: const EdgeInsets.only(right: 12),
               child: Column(
                 children: [
                   Container(
                     width: 62,
                     height: 62,
+                    margin: const EdgeInsets.only(right: 12),
                     decoration: BoxDecoration(
-                      color: Color(int.parse('FF${cat.colorHex}', radix: 16))
-                          .withOpacity(0.1),
-                      borderRadius:
-                          BorderRadius.circular(AppConstants.radiusL),
-                      border: Border.all(
-                        color:
-                            Color(int.parse('FF${cat.colorHex}', radix: 16))
-                                .withOpacity(0.2),
-                        width: 1.5,
-                      ),
+                      color: Color(int.parse('FF${cat.colorHex}', radix: 16)).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(AppConstants.radiusL),
                     ),
-                    child: Center(
-                      child: Text(cat.icon,
-                          style: const TextStyle(fontSize: 28)),
-                    ),
+                    child: Center(child: Text(cat.icon, style: const TextStyle(fontSize: 28))),
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    cat.name,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  Text(cat.name, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600), textAlign: TextAlign.center),
                 ],
               ),
             ),
@@ -293,25 +275,42 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeaturedCarousel(BuildContext context) {
-    final places = MockPlaces.featured;
+  Widget _buildFeaturedCarousel(BuildContext context, PlaceProvider placeProvider) {
+    final places = placeProvider.featuredPlaces.isNotEmpty ? placeProvider.featuredPlaces : placeProvider.places.take(5).toList();
     return SizedBox(
       height: AppConstants.placeCardHeight,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
         itemCount: places.length,
-        itemBuilder: (_, i) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 14),
-            child: PlaceCard(
-              place: places[i],
-              onTap: () => context.go(
-                '${AppConstants.routePlaceDetail}?id=${places[i].id}',
-              ),
-            ),
-          );
-        },
+        itemBuilder: (_, i) => Padding(
+          padding: const EdgeInsets.only(right: 14),
+          child: PlaceCard(place: places[i], onTap: () => context.go('${AppConstants.routePlaceDetail}?id=${places[i].id}')),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEvents(EventProvider eventProvider) {
+    if (eventProvider.isLoading) {
+      return const SizedBox(height: 180, child: Center(child: CircularProgressIndicator()));
+    }
+    if (eventProvider.events.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
+        child: Text('No hay eventos cargados por ahora.', style: TextStyle(color: AppColors.textTertiary)),
+      );
+    }
+    return SizedBox(
+      height: 190,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
+        itemCount: eventProvider.events.length,
+        itemBuilder: (_, index) => Padding(
+          padding: const EdgeInsets.only(right: 14),
+          child: EventCard(event: eventProvider.events[index]),
+        ),
       ),
     );
   }
@@ -321,85 +320,42 @@ class HomeScreen extends StatelessWidget {
       height: 170,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding:
-            const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
+        padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
         children: [
-          SizedBox(
-            width: 280,
-            child: BudgetPlanCard(
-              emoji: '🎒',
-              title: 'Mochilero Paisa',
-              budget: '\$250.000',
-              days: '3',
-              description: 'Lo mejor de Medellín con presupuesto viajero.',
-              onTap: () => context.go(AppConstants.routePlanner),
-            ),
-          ),
+          SizedBox(width: 280, child: BudgetPlanCard(emoji: '??', title: 'Mochilero Paisa', budget: '\$250.000', days: '3', description: 'Lo mejor de Medellin con presupuesto viajero.', onTap: () => context.go(AppConstants.routePlanner))),
           const SizedBox(width: 14),
-          SizedBox(
-            width: 280,
-            child: BudgetPlanCard(
-              emoji: '💑',
-              title: 'Escapada Romántica',
-              budget: '\$800.000',
-              days: '2',
-              description: 'Experiencias premium para pareja.',
-              onTap: () => context.go(AppConstants.routePlanner),
-            ),
-          ),
+          SizedBox(width: 280, child: BudgetPlanCard(emoji: '??', title: 'Escapada Romantica', budget: '\$800.000', days: '2', description: 'Experiencias premium para pareja.', onTap: () => context.go(AppConstants.routePlanner))),
           const SizedBox(width: 14),
-          SizedBox(
-            width: 280,
-            child: BudgetPlanCard(
-              emoji: '👨‍👩‍👧‍👦',
-              title: 'Plan Familiar',
-              budget: '\$600.000',
-              days: '4',
-              description: 'Actividades para toda la familia.',
-              onTap: () => context.go(AppConstants.routePlanner),
-            ),
-          ),
+          SizedBox(width: 280, child: BudgetPlanCard(emoji: '???????????', title: 'Plan Familiar', budget: '\$600.000', days: '4', description: 'Actividades para toda la familia.', onTap: () => context.go(AppConstants.routePlanner))),
         ],
       ),
     );
   }
 
-  Widget _buildPopularList(BuildContext context) {
-    final places = MockPlaces.popular.take(3).toList();
+  Widget _buildPopularList(BuildContext context, PlaceProvider placeProvider) {
+    final places = placeProvider.places.take(3).toList();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
       child: Column(
         children: places
-            .map((p) => PlaceCard(
-                  place: p,
-                  isHorizontal: true,
-                  onTap: () => context.go(
-                      '${AppConstants.routePlaceDetail}?id=${p.id}'),
-                ))
+            .map((place) => PlaceCard(place: place, isHorizontal: true, onTap: () => context.go('${AppConstants.routePlaceDetail}?id=${place.id}')))
             .toList(),
       ),
     );
   }
 
-  Widget _buildNearby(BuildContext context) {
-    final places = MockPlaces.nearbyPlaces.take(3).toList();
+  Widget _buildNearby(BuildContext context, PlaceProvider placeProvider) {
+    final places = placeProvider.nearbyPlaces.isNotEmpty ? placeProvider.nearbyPlaces : placeProvider.places.take(3).toList();
     return SizedBox(
       height: AppConstants.placeCardHeight,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding:
-            const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
+        padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
         itemCount: places.length,
-        itemBuilder: (_, i) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 14),
-            child: PlaceCard(
-              place: places[i],
-              onTap: () => context
-                  .go('${AppConstants.routePlaceDetail}?id=${places[i].id}'),
-            ),
-          );
-        },
+        itemBuilder: (_, i) => Padding(
+          padding: const EdgeInsets.only(right: 14),
+          child: PlaceCard(place: places[i], onTap: () => context.go('${AppConstants.routePlaceDetail}?id=${places[i].id}')),
+        ),
       ),
     );
   }

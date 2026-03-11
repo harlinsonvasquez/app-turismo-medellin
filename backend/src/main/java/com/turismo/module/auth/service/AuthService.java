@@ -31,24 +31,26 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmailIgnoreCase(request.email())) {
+        String normalizedEmail = request.email().trim().toLowerCase();
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
             throw new ConflictException("A user with that email already exists");
         }
 
         User user = new User();
         user.setFullName(request.fullName().trim());
-        user.setEmail(request.email().trim().toLowerCase());
+        user.setEmail(normalizedEmail);
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setRole(UserRole.TOURIST);
         user.setActive(true);
 
-        User savedUser = userRepository.save(user);
+        User savedUser = userRepository.saveAndFlush(user);
         return buildAuthResponse(savedUser);
     }
 
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmailIgnoreCase(request.email().trim())
+        String normalizedEmail = request.email().trim().toLowerCase();
+        User user = userRepository.findByEmailIgnoreCase(normalizedEmail)
                 .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
 
         if (!user.isActive() || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
