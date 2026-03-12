@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../core/error/api_error_mapper.dart';
 import '../../core/error/api_exception.dart';
 import '../../data/models/user_model.dart';
 import '../../data/services/safety_service.dart';
@@ -20,7 +21,11 @@ class SafetyProvider extends ChangeNotifier {
     try {
       tips = await _safetyService.fetchSafetyTips(city: city, zone: zone);
     } on ApiException catch (exception) {
-      error = exception.message;
+      error = ApiErrorMapper.messageFor(
+        exception,
+        offlineMessage: 'No se pudo conectar con el servidor.',
+        fallbackMessage: 'No pudimos cargar los consejos de seguridad.',
+      );
     } finally {
       isLoading = false;
       notifyListeners();

@@ -5,7 +5,7 @@ import 'package:app_turismo/core/constants/app_constants.dart';
 import 'package:app_turismo/core/theme/app_theme.dart';
 import 'package:app_turismo/presentation/screens/business_promo_screen.dart';
 import 'package:app_turismo/presentation/screens/discover_screen.dart';
-import 'package:app_turismo/presentation/screens/generated_plan_screen.dart';
+import 'package:app_turismo/presentation/screens/generated_plan_page.dart';
 import 'package:app_turismo/presentation/screens/home_screen.dart';
 import 'package:app_turismo/presentation/screens/location_permission_screen.dart';
 import 'package:app_turismo/presentation/screens/login_screen.dart';
@@ -15,16 +15,31 @@ import 'package:app_turismo/presentation/screens/place_detail_screen.dart';
 import 'package:app_turismo/presentation/screens/profile_screen.dart';
 import 'package:app_turismo/presentation/screens/register_screen.dart';
 import 'package:app_turismo/presentation/screens/safety_screen.dart';
-import 'package:app_turismo/presentation/screens/saved_screen.dart';
+import 'package:app_turismo/presentation/screens/saved_page.dart';
 import 'package:app_turismo/presentation/screens/splash_screen.dart';
 import 'package:app_turismo/presentation/screens/trip_planner_screen.dart';
 
 const _kNavItems = [
-  _NavItem(label: 'Inicio', icon: Icons.home_outlined, activeIcon: Icons.home_rounded),
-  _NavItem(label: 'Explorar', icon: Icons.map_outlined, activeIcon: Icons.map_rounded),
-  _NavItem(label: 'Planear', icon: Icons.calendar_today_outlined, activeIcon: Icons.calendar_today_rounded),
-  _NavItem(label: 'Cerca', icon: Icons.near_me_outlined, activeIcon: Icons.near_me_rounded),
-  _NavItem(label: 'Perfil', icon: Icons.person_outline_rounded, activeIcon: Icons.person_rounded),
+  _NavItem(
+      label: 'Inicio',
+      icon: Icons.home_outlined,
+      activeIcon: Icons.home_rounded),
+  _NavItem(
+      label: 'Explorar',
+      icon: Icons.map_outlined,
+      activeIcon: Icons.map_rounded),
+  _NavItem(
+      label: 'Planear',
+      icon: Icons.calendar_today_outlined,
+      activeIcon: Icons.calendar_today_rounded),
+  _NavItem(
+      label: 'Cerca',
+      icon: Icons.near_me_outlined,
+      activeIcon: Icons.near_me_rounded),
+  _NavItem(
+      label: 'Perfil',
+      icon: Icons.person_outline_rounded,
+      activeIcon: Icons.person_rounded),
 ];
 
 class AppRouter {
@@ -35,11 +50,23 @@ class AppRouter {
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppConstants.routeSplash,
     routes: [
-      GoRoute(path: AppConstants.routeSplash, builder: (_, __) => const SplashScreen()),
-      GoRoute(path: AppConstants.routeOnboarding, builder: (_, __) => const OnboardingScreen()),
-      GoRoute(path: AppConstants.routeLocationPermission, builder: (_, __) => const LocationPermissionScreen()),
-      GoRoute(path: AppConstants.routeLogin, parentNavigatorKey: _rootNavigatorKey, builder: (_, __) => const LoginScreen()),
-      GoRoute(path: AppConstants.routeRegister, parentNavigatorKey: _rootNavigatorKey, builder: (_, __) => const RegisterScreen()),
+      GoRoute(
+          path: AppConstants.routeSplash,
+          builder: (_, __) => const SplashScreen()),
+      GoRoute(
+          path: AppConstants.routeOnboarding,
+          builder: (_, __) => const OnboardingScreen()),
+      GoRoute(
+          path: AppConstants.routeLocationPermission,
+          builder: (_, __) => const LocationPermissionScreen()),
+      GoRoute(
+          path: AppConstants.routeLogin,
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (_, __) => const LoginScreen()),
+      GoRoute(
+          path: AppConstants.routeRegister,
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (_, __) => const RegisterScreen()),
       GoRoute(
         path: AppConstants.routePlaceDetail,
         parentNavigatorKey: _rootNavigatorKey,
@@ -48,19 +75,48 @@ class AppRouter {
           return PlaceDetailScreen(placeId: id);
         },
       ),
-      GoRoute(path: AppConstants.routeGeneratedPlan, parentNavigatorKey: _rootNavigatorKey, builder: (_, __) => const GeneratedPlanScreen()),
-      GoRoute(path: AppConstants.routeSafety, parentNavigatorKey: _rootNavigatorKey, builder: (_, __) => const SafetyScreen()),
-      GoRoute(path: AppConstants.routeSaved, parentNavigatorKey: _rootNavigatorKey, builder: (_, __) => const SavedScreen()),
-      GoRoute(path: AppConstants.routeBusinessPromo, parentNavigatorKey: _rootNavigatorKey, builder: (_, __) => const BusinessPromoScreen()),
+      GoRoute(
+        path: AppConstants.routeGeneratedPlan,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, __) => const GeneratedPlanPage(),
+      ),
+      GoRoute(
+          path: AppConstants.routeSafety,
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (_, __) => const SafetyScreen()),
+      GoRoute(
+          path: AppConstants.routeSaved,
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (_, __) => const SavedPage()),
+      GoRoute(
+          path: AppConstants.routeBusinessPromo,
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (_, __) => const BusinessPromoScreen()),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
-        builder: (context, state, child) => _ShellScaffold(state: state, child: child),
+        builder: (context, state, child) =>
+            _ShellScaffold(state: state, child: child),
         routes: [
-          GoRoute(path: AppConstants.routeHome, pageBuilder: (context, state) => const NoTransitionPage(child: HomeScreen())),
-          GoRoute(path: AppConstants.routeDiscover, pageBuilder: (context, state) => const NoTransitionPage(child: DiscoverScreen())),
-          GoRoute(path: AppConstants.routePlanner, pageBuilder: (context, state) => const NoTransitionPage(child: TripPlannerScreen())),
-          GoRoute(path: AppConstants.routeNearby, pageBuilder: (context, state) => const NoTransitionPage(child: NearbyScreen())),
-          GoRoute(path: AppConstants.routeProfile, pageBuilder: (context, state) => const NoTransitionPage(child: ProfileScreen())),
+          GoRoute(
+              path: AppConstants.routeHome,
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: HomeScreen())),
+          GoRoute(
+              path: AppConstants.routeDiscover,
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: DiscoverScreen())),
+          GoRoute(
+              path: AppConstants.routePlanner,
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: TripPlannerScreen())),
+          GoRoute(
+              path: AppConstants.routeNearby,
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: NearbyScreen())),
+          GoRoute(
+              path: AppConstants.routeProfile,
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: ProfileScreen())),
         ],
       ),
     ],
@@ -118,7 +174,10 @@ class _ShellScaffold extends StatelessWidget {
                 final i = entry.key;
                 final item = entry.value;
                 final isActive = i == currentIndex;
-                return _NavButton(item: item, isActive: isActive, onTap: () => _onTabTapped(context, i));
+                return _NavButton(
+                    item: item,
+                    isActive: isActive,
+                    onTap: () => _onTabTapped(context, i));
               }).toList(),
             ),
           ),
@@ -133,7 +192,8 @@ class _NavButton extends StatelessWidget {
   final bool isActive;
   final VoidCallback onTap;
 
-  const _NavButton({required this.item, required this.isActive, required this.onTap});
+  const _NavButton(
+      {required this.item, required this.isActive, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +204,9 @@ class _NavButton extends StatelessWidget {
         duration: AppConstants.animFast,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive ? AppColors.primary.withOpacity(0.1) : Colors.transparent,
+          color: isActive
+              ? AppColors.primary.withOpacity(0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(AppConstants.radiusM),
         ),
         child: Column(
@@ -179,5 +241,6 @@ class _NavItem {
   final String label;
   final IconData icon;
   final IconData activeIcon;
-  const _NavItem({required this.label, required this.icon, required this.activeIcon});
+  const _NavItem(
+      {required this.label, required this.icon, required this.activeIcon});
 }

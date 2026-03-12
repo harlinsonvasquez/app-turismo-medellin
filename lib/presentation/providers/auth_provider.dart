@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../core/error/api_error_mapper.dart';
 import '../../core/error/api_exception.dart';
 import '../../core/storage/token_storage.dart';
 import '../../data/models/user_model.dart';
@@ -45,7 +46,13 @@ class AuthProvider extends ChangeNotifier {
       user = response.user;
       return true;
     } on ApiException catch (exception) {
-      error = _authMessage(exception, fallback: 'No fue posible iniciar sesion.');
+      error = ApiErrorMapper.messageFor(
+        exception,
+        offlineMessage: 'No se pudo conectar con el servidor.',
+        fallbackMessage: 'No fue posible iniciar sesion.',
+        badRequestMessage: 'Revisa los datos ingresados.',
+        unauthorizedMessage: 'Correo o contrasena incorrectos.',
+      );
       return false;
     } finally {
       isLoading = false;
@@ -63,7 +70,13 @@ class AuthProvider extends ChangeNotifier {
       user = response.user;
       return true;
     } on ApiException catch (exception) {
-      error = _authMessage(exception, fallback: 'No fue posible crear la cuenta.');
+      error = ApiErrorMapper.messageFor(
+        exception,
+        offlineMessage: 'No se pudo conectar con el servidor.',
+        fallbackMessage: 'No fue posible crear la cuenta.',
+        badRequestMessage: 'Revisa los datos de registro.',
+        conflictMessage: 'Ya existe una cuenta con ese correo.',
+      );
       return false;
     } finally {
       isLoading = false;
@@ -77,7 +90,12 @@ class AuthProvider extends ChangeNotifier {
       user = await _authService.me();
       error = null;
     } on ApiException catch (exception) {
-      error = _authMessage(exception, fallback: 'No pudimos cargar tu perfil.');
+      error = ApiErrorMapper.messageFor(
+        exception,
+        offlineMessage: 'No se pudo conectar con el servidor.',
+        fallbackMessage: 'No pudimos cargar tu perfil.',
+        unauthorizedMessage: 'Tu sesion ya no es valida. Inicia sesion nuevamente.',
+      );
     }
     notifyListeners();
   }
@@ -87,15 +105,5 @@ class AuthProvider extends ChangeNotifier {
     user = null;
     error = null;
     notifyListeners();
-  }
-
-  String _authMessage(ApiException exception, {required String fallback}) {
-    if (exception.statusCode == null) {
-      return 'No se pudo conectar con el servidor.';
-    }
-    if (exception.statusCode == 400 || exception.statusCode == 401 || exception.statusCode == 409) {
-      return exception.message;
-    }
-    return fallback;
   }
 }

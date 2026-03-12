@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../core/error/api_error_mapper.dart';
 import '../../core/error/api_exception.dart';
 import '../../data/models/user_model.dart';
 import '../../data/services/favorite_service.dart';
@@ -20,7 +21,12 @@ class FavoritesProvider extends ChangeNotifier {
     try {
       favorites = await _favoriteService.fetchFavorites();
     } on ApiException catch (exception) {
-      error = exception.message;
+      error = ApiErrorMapper.messageFor(
+        exception,
+        offlineMessage: 'No se pudo conectar con el servidor.',
+        fallbackMessage: 'No pudimos cargar tus favoritos.',
+        unauthorizedMessage: 'Inicia sesion para ver tus favoritos.',
+      );
     } finally {
       isLoading = false;
       notifyListeners();
@@ -48,7 +54,13 @@ class FavoritesProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } on ApiException catch (exception) {
-      error = exception.message;
+      error = ApiErrorMapper.messageFor(
+        exception,
+        offlineMessage: 'No se pudo conectar con el servidor.',
+        fallbackMessage: 'No pudimos actualizar tus favoritos.',
+        unauthorizedMessage: 'Inicia sesion para guardar favoritos.',
+        conflictMessage: 'Ese lugar ya estaba en tus favoritos.',
+      );
       notifyListeners();
       return false;
     }

@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:app_turismo/core/constants/app_constants.dart';
 import 'package:app_turismo/core/theme/app_theme.dart';
 import 'package:app_turismo/presentation/providers/auth_provider.dart';
+import 'package:app_turismo/presentation/providers/favorites_provider.dart';
+import 'package:app_turismo/presentation/providers/itinerary_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -83,17 +85,28 @@ class ProfileScreen extends StatelessWidget {
                         const SizedBox(width: 10),
                         _StatBadge(value: user.active ? 'Activo' : 'Inactivo', label: 'Estado'),
                         const SizedBox(width: 10),
-                        _StatBadge(value: 'JWT', label: 'Sesion real'),
+                        const _StatBadge(value: 'JWT', label: 'Sesion real'),
                       ],
                     ),
                     const SizedBox(height: 24),
-                    _SectionTitle('Cuenta'),
+                    const _SectionTitle('Cuenta'),
                     const SizedBox(height: 10),
                     _SettingsCard(children: [
                       _SettingsTile(icon: '??', title: 'Mis guardados', onTap: () => context.go(AppConstants.routeSaved)),
                       _SettingsTile(icon: '???', title: 'Consejos de seguridad', onTap: () => context.go(AppConstants.routeSafety)),
                       _SettingsTile(icon: '??', title: 'Promover mi negocio', onTap: () => context.go(AppConstants.routeBusinessPromo)),
-                      _SettingsTile(icon: '??', title: 'Cerrar sesion', onTap: () => context.read<AuthProvider>().logout()),
+                      _SettingsTile(
+                        icon: '??',
+                        title: 'Cerrar sesion',
+                        onTap: () async {
+                          await context.read<AuthProvider>().logout();
+                          await context.read<FavoritesProvider>().clear();
+                          context.read<ItineraryProvider>().clearSessionData();
+                          if (context.mounted) {
+                            context.go(AppConstants.routeHome);
+                          }
+                        },
+                      ),
                     ]),
                   ],
                 ],

@@ -91,9 +91,7 @@ class ApiClient {
       );
     }
 
-    final backendMessage = data is Map<String, dynamic>
-        ? (data['message']?.toString() ?? data['error']?.toString())
-        : null;
+    final backendMessage = _backendMessage(data);
 
     late final String message;
     if (statusCode == 400) {
@@ -113,5 +111,31 @@ class ApiClient {
     }
 
     return ApiException(message, statusCode: statusCode);
+  }
+
+  String? _backendMessage(Object? data) {
+    if (data is Map<String, dynamic>) {
+      final fieldErrors = data['fieldErrors'];
+      if (fieldErrors is List && fieldErrors.isNotEmpty) {
+        final firstFieldError = fieldErrors.first;
+        if (firstFieldError is Map<String, dynamic>) {
+          final fieldMessage = firstFieldError['message']?.toString();
+          if (fieldMessage != null && fieldMessage.isNotEmpty) {
+            return fieldMessage;
+          }
+        }
+      }
+
+      final message = data['message']?.toString() ?? data['error']?.toString();
+      if (message != null && message.isNotEmpty) {
+        return message;
+      }
+    }
+
+    if (data is String && data.trim().isNotEmpty) {
+      return data.trim();
+    }
+
+    return null;
   }
 }

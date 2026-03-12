@@ -24,6 +24,14 @@ Example for a physical device on the same network:
 flutter run --dart-define=API_BASE_URL=http://192.168.1.20:8080
 ```
 
+Run the backend with the `local` Spring profile so the development-only CORS rules are enabled:
+
+```bash
+cd backend
+docker compose up -d
+.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=local
+```
+
 ## What is now connected
 
 - Authentication: `/api/auth/login`, `/api/auth/register`, `/api/auth/me`

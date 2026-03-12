@@ -155,7 +155,7 @@ class MembershipPlanCard extends StatelessWidget {
                   children: [
                     Text(
                       plan.price,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                         color: AppColors.textPrimary,

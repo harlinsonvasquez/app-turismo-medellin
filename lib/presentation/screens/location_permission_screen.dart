@@ -60,22 +60,22 @@ class LocationPermissionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 36),
               // Benefits list
-              _BenefitItem(
+              const _BenefitItem(
                 icon: '🏨',
                 text: 'Descubre hoteles y restaurantes cercanos',
               ),
               const SizedBox(height: 12),
-              _BenefitItem(
+              const _BenefitItem(
                 icon: '📏',
                 text: 'Ve la distancia exacta desde donde estás',
               ),
               const SizedBox(height: 12),
-              _BenefitItem(
+              const _BenefitItem(
                 icon: '🛡️',
                 text: 'Alertas de seguridad en tu zona actual',
               ),
               const SizedBox(height: 12),
-              _BenefitItem(
+              const _BenefitItem(
                 icon: '🗺️',
                 text: 'Rutas optimizadas en tus itinerarios',
               ),

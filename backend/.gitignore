@@ -1,6 +1,0 @@
-/target/
-/.idea/
-/.vscode/
-/.mvn/wrapper/maven-wrapper.jar
-*.log
-.env

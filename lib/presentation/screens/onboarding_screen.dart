@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:app_turismo/core/theme/app_theme.dart';
 import 'package:app_turismo/core/constants/app_constants.dart';
-import 'package:app_turismo/presentation/widgets/common_widgets.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -97,8 +96,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: const Text(
                         'Omitir',
                         style: TextStyle(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w500),
+                            color: Colors.white70, fontWeight: FontWeight.w500),
                       ),
                     ),
                 ],

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../core/error/api_error_mapper.dart';
 import '../../core/error/api_exception.dart';
 import '../../data/models/place_model.dart';
 import '../../data/services/place_service.dart';
@@ -24,9 +25,11 @@ class PlaceProvider extends ChangeNotifier {
       featuredPlaces = places.where((item) => item.isFeatured).toList();
       nearbyPlaces = places.where((item) => item.distanceKm > 0 && item.distanceKm <= 5).toList();
     } on ApiException catch (exception) {
-      error = exception.statusCode == null
-          ? 'No se pudo conectar con el servidor.'
-          : 'No pudimos cargar los lugares en este momento.';
+      error = ApiErrorMapper.messageFor(
+        exception,
+        offlineMessage: 'No se pudo conectar con el servidor.',
+        fallbackMessage: 'No pudimos cargar los lugares.',
+      );
     } finally {
       isLoading = false;
       notifyListeners();
@@ -37,9 +40,11 @@ class PlaceProvider extends ChangeNotifier {
     try {
       return await _placeService.fetchPlaceDetail(id);
     } on ApiException catch (exception) {
-      error = exception.statusCode == null
-          ? 'No se pudo conectar con el servidor.'
-          : 'No pudimos cargar el detalle del lugar.';
+      error = ApiErrorMapper.messageFor(
+        exception,
+        offlineMessage: 'No se pudo conectar con el servidor.',
+        fallbackMessage: 'No pudimos cargar el detalle del lugar.',
+      );
       notifyListeners();
       return null;
     }

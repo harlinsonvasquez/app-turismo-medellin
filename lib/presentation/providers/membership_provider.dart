@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../core/error/api_error_mapper.dart';
 import '../../core/error/api_exception.dart';
 import '../../data/models/user_model.dart';
 import '../../data/services/membership_service.dart';
@@ -20,7 +21,11 @@ class MembershipProvider extends ChangeNotifier {
     try {
       plans = await _membershipService.fetchPlans();
     } on ApiException catch (exception) {
-      error = exception.message;
+      error = ApiErrorMapper.messageFor(
+        exception,
+        offlineMessage: 'No se pudo conectar con el servidor.',
+        fallbackMessage: 'No pudimos cargar los planes de membresia.',
+      );
     } finally {
       isLoading = false;
       notifyListeners();
