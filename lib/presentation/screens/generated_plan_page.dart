@@ -33,7 +33,19 @@ class _GeneratedPlanPageState extends State<GeneratedPlanPage> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Tu plan generado')),
+      appBar: AppBar(
+        title: const Text('Tu plan generado'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => context.pop(),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home_rounded),
+            onPressed: () => context.go(AppConstants.routeHome),
+          ),
+        ],
+      ),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
@@ -145,10 +157,12 @@ class _GeneratedPlanPageState extends State<GeneratedPlanPage> {
         child: Row(
           children: [
             Expanded(
-                child: OutlinedButton.icon(
-                    onPressed: () => context.go(AppConstants.routePlanner),
-                    icon: const Icon(Icons.refresh_rounded, size: 18),
-                    label: const Text('Regenerar'))),
+              child: OutlinedButton.icon(
+                onPressed: () => context.go(AppConstants.routePlanner),
+                icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                label: const Text('Volver'),
+              ),
+            ),
             const SizedBox(width: 12),
             Expanded(
               flex: 2,

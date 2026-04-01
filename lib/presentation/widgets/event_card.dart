@@ -58,7 +58,7 @@ class EventCard extends StatelessWidget {
                   color: AppColors.textPrimary),
             ),
             const SizedBox(height: 8),
-            Expanded( // Expanded evita desbordamientos y empuja el contenido hacia abajo como lo haria un Spacer
+            Flexible(
               child: Text(
                 event.address,
                 maxLines: 2,

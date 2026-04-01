@@ -85,11 +85,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
-                  decoration:
-                      const InputDecoration(labelText: 'Correo electronico'),
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'Ingresa tu correo'
-                      : null,
+                  decoration: const InputDecoration(
+                    labelText: 'Correo electronico',
+                    prefixIcon: Icon(Icons.email_outlined),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return 'Ingresa tu correo';
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                      return 'Ingresa un correo valido';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(

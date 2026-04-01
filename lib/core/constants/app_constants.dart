@@ -36,6 +36,7 @@ class AppConstants {
   static const double placeCardHeight = 280.0;
   static const double categoryCardSize = 80.0;
   static const double heroImageHeight = 300.0;
+  static const double appBarExpandedHeight = 200.0;
 
   static const Duration animFast = Duration(milliseconds: 200);
   static const Duration animMedium = Duration(milliseconds: 350);

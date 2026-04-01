@@ -35,7 +35,19 @@ class _GeneratedPlanScreenState extends State<GeneratedPlanScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Tu plan generado')),
+      appBar: AppBar(
+        title: const Text('Tu plan generado'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppConstants.routeHome);
+            }
+          },
+        ),
+      ),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(

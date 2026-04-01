@@ -314,7 +314,7 @@ class BudgetPlanCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Expanded( // Expanded evita overflow cuando el Widget se renderiza en un Container fijo
+            Flexible(
               child: Text(
                 description,
                 style: TextStyle(
@@ -405,8 +405,8 @@ class ItineraryDayCard extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 48,
-              height: 48,
+              constraints: const BoxConstraints(minWidth: 54, minHeight: 54),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               decoration: BoxDecoration(
                 color: AppColors.primary,
                 borderRadius: BorderRadius.circular(AppConstants.radiusM),
@@ -462,11 +462,12 @@ class ItineraryDayCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Row(
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
                     children: [
                       _buildTag(
                           '$activitiesCount actividades', AppColors.primary),
-                      const SizedBox(width: 6),
                       _buildTag(dailyBudget, AppColors.secondary),
                     ],
                   ),

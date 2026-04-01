@@ -260,19 +260,29 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                       Row(
                         children: [
                           Expanded(
-                              child: OutlinedButton.icon(
-                                  onPressed: () =>
-                                      context.go(AppConstants.routeNearby),
-                                  icon:
-                                      const Icon(Icons.route_rounded, size: 18),
-                                  label: const Text('Ver ruta'))),
+                            child: OutlinedButton.icon(
+                              onPressed: () => context.go(AppConstants.routeNearby),
+                              icon: const Icon(Icons.route_rounded, size: 18),
+                              label: const Text('Ver ruta'),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                            ),
+                          ),
                           const SizedBox(width: 10),
                           Expanded(
-                              child: ElevatedButton.icon(
-                                  onPressed: () =>
-                                      context.go(AppConstants.routePlanner),
-                                  icon: const Icon(Icons.add_rounded, size: 18),
-                                  label: const Text('Agregar a plan'))),
+                            flex: 2,
+                            child: ElevatedButton.icon(
+                              onPressed: () => context.go(AppConstants.routePlanner),
+                              icon: const Icon(Icons.add_rounded, size: 18),
+                              label: const Text('Agregar a plan'),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                elevation: 4,
+                                shadowColor: AppColors.primary.withOpacity(0.3),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ],

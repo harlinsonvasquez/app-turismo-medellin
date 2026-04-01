@@ -48,7 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: RefreshIndicator(
+      body: SafeArea(
+        bottom: false,
+        child: RefreshIndicator(
         onRefresh: () async {
           await context
               .read<PlaceProvider>()
@@ -145,13 +147,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+      ),
     );
   }
 
   SliverAppBar _buildAppBar(BuildContext context, AuthProvider auth) {
     final userName = auth.user?.name.split(' ').first ?? 'viajero';
     return SliverAppBar(
-      expandedHeight: 140, // Incrementado para evitar el overflow del encabezado
+      expandedHeight: 160, // Incrementado para evitar el overflow del encabezado en pantallas pequeñas al crecer el texto
       floating: true,
       snap: true,
       backgroundColor: AppColors.background,
@@ -282,44 +285,54 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCategories(BuildContext context) {
-    return SizedBox(
-      height: 100,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
-        itemCount: AppCatalog.categories.length,
-        itemBuilder: (_, i) {
-          final cat = AppCatalog.categories[i];
-          return GestureDetector(
-            onTap: () => context.go(AppConstants.routeDiscover),
-            child: SizedBox(
-              width: 76,
-              child: Column(
-                children: [
-                  Container(
-                    width: 62,
-                    height: 62,
-                    margin: const EdgeInsets.only(right: 12),
-                    decoration: BoxDecoration(
-                      color: Color(int.parse('FF${cat.colorHex}', radix: 16))
-                          .withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(AppConstants.radiusL),
-                    ),
-                    child: Center(
-                        child: Text(cat.icon,
-                            style: const TextStyle(fontSize: 28))),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmallScreen = constraints.maxWidth < 360;
+        final itemWidth = isSmallScreen ? 65.0 : 76.0;
+        final iconSize = isSmallScreen ? 50.0 : 62.0;
+        final fontSize = isSmallScreen ? 10.0 : 11.0;
+        final itemHeight = isSmallScreen ? 110.0 : 120.0;
+
+        return SizedBox(
+          height: itemHeight,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
+            itemCount: AppCatalog.categories.length,
+            itemBuilder: (_, i) {
+              final cat = AppCatalog.categories[i];
+              return GestureDetector(
+                onTap: () => context.go(AppConstants.routeDiscover),
+                child: SizedBox(
+                  width: itemWidth,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: iconSize,
+                        height: iconSize,
+                        margin: const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          color: Color(int.parse('FF${cat.colorHex}', radix: 16))
+                              .withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(AppConstants.radiusL),
+                        ),
+                        child: Center(
+                            child: Text(cat.icon,
+                                style: TextStyle(fontSize: isSmallScreen ? 24 : 28))),
+                      ),
+                      SizedBox(height: isSmallScreen ? 4 : 6),
+                      Text(cat.name,
+                          style: TextStyle(
+                              fontSize: fontSize, fontWeight: FontWeight.w600),
+                          textAlign: TextAlign.center),
+                    ],
                   ),
-                  const SizedBox(height: 6),
-                  Text(cat.name,
-                      style: const TextStyle(
-                          fontSize: 11, fontWeight: FontWeight.w600),
-                      textAlign: TextAlign.center),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -328,8 +341,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final places = placeProvider.featuredPlaces.isNotEmpty
         ? placeProvider.featuredPlaces
         : placeProvider.places.take(5).toList();
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenHeight < 640;
+    final cardHeight = isSmallScreen ? 240.0 : AppConstants.placeCardHeight;
+
     return SizedBox(
-      height: AppConstants.placeCardHeight + 10, // Se añade un ligero offset contra overflows
+      height: cardHeight + 10,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
@@ -358,7 +375,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
     return SizedBox(
-      height: 200, // Altura base incrementada para compensar flex logs
+      height: 240, // Altura base incrementada para compensar flex logs y evitar Bottom Overflowed by 18 pixels
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
@@ -373,7 +390,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildBudgetPlans(BuildContext context) {
     return SizedBox(
-      height: 180, // Incrementado vs 170 original para evitar escapes
+      height: 220, // Incrementado vs 170 original para evitar escapes y BOTTOM OVERFLOWED BY 12 PIXELS
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
@@ -432,8 +449,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final places = placeProvider.nearbyPlaces.isNotEmpty
         ? placeProvider.nearbyPlaces
         : placeProvider.places.take(3).toList();
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenHeight < 640;
+    final cardHeight = isSmallScreen ? 240.0 : AppConstants.placeCardHeight;
+
     return SizedBox(
-      height: AppConstants.placeCardHeight + 10, // Más amplio
+      height: cardHeight + 10,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),

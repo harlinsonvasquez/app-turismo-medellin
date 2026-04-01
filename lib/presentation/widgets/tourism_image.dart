@@ -44,8 +44,8 @@ class ImagenTuristica extends StatelessWidget {
                   mostrarCarga: true,
                 ),
                 errorWidget: (_, __, ___) => _PlaceholderImagenTuristica(
-                  icono: placeholderIcon,
-                  etiqueta: placeholderLabel,
+                  icono: Icons.broken_image_outlined,
+                  etiqueta: 'Error al cargar',
                 ),
               )
             : _PlaceholderImagenTuristica(

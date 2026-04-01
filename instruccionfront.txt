@@ -1,0 +1,151 @@
+Actúa como un Senior Flutter Developer experto en UI/UX, responsive design y buenas prácticas en Flutter.
+
+Voy a proporcionarte un proyecto Flutter completo. Tu tarea es hacer una auditoría profunda del frontend SIN romper la funcionalidad existente.
+
+### OBJETIVO PRINCIPAL
+Analizar y mejorar:
+- Todos los componentes visuales
+- La navegación entre pantallas/módulos
+- Botones, tarjetas y layouts
+- Problemas de overflow (RenderFlex overflowed)
+- Experiencia de usuario (UX)
+
+---
+
+### 1. ANÁLISIS DE UI Y LAYOUT
+
+Revisa TODOS los widgets del proyecto y:
+
+- Identifica dónde ocurre:
+  - "A RenderFlex overflowed by X pixels"
+- Explica exactamente POR QUÉ ocurre cada overflow
+- Indica el archivo y línea aproximada donde sucede
+
+Luego propone soluciones usando:
+- Expanded
+- Flexible
+- SingleChildScrollView
+- ListView
+- Wrap
+- MediaQuery
+- LayoutBuilder
+
+IMPORTANTE:
+- NO rompas el diseño actual
+- Mantén la intención visual original
+- Haz los cambios mínimos necesarios pero correctos
+
+---
+
+### 2. RESPONSIVE DESIGN (MUY IMPORTANTE)
+
+Asegúrate de que la app funcione bien en:
+- Pantallas pequeñas
+- Pantallas grandes
+- Diferentes resoluciones
+
+Corrige:
+- Tamaños fijos (width/height hardcodeados)
+- Márgenes incorrectos
+- Elementos que se salen de la pantalla
+
+Propón:
+- Uso de MediaQuery
+- Uso de constraints dinámicos
+- Buen manejo de Column y Row
+
+---
+
+### 3. BOTONES Y TARJETAS
+
+Analiza:
+- Tamaño de botones (tap area adecuada)
+- Espaciado interno (padding)
+- Alineación
+- Consistencia visual
+
+Corrige:
+- Botones que causan overflow
+- Botones difíciles de presionar
+- Elementos mal alineados
+
+---
+
+### 4. NAVEGACIÓN ENTRE PANTALLAS
+
+Revisa TODA la navegación:
+
+- Verifica que todas las pantallas tengan:
+  - Botón de regreso (back)
+  - Navegación consistente
+
+CASO ESPECÍFICO:
+- Cuando se crea un itinerario:
+  ❌ No hay botón para volver atrás
+  ✔️ Debes agregar navegación adecuada
+
+Solución esperada:
+- Uso de Navigator.pop(context)
+- AppBar con botón back automático
+- O navegación manual si aplica
+
+---
+
+### 5. EXPERIENCIA DE USUARIO (UX)
+
+Evalúa:
+- Flujo de navegación
+- Claridad de acciones
+- Feedback visual
+
+Sugiere mejoras como:
+- Scroll donde sea necesario
+- Mejor distribución de contenido
+- Evitar saturación visual
+
+---
+
+### 6. IMÁGENES (IMPORTANTE)
+
+Revisa:
+- Dónde deberían cargarse imágenes y no lo hacen
+- Problemas de tamaño o desbordamiento
+- Uso correcto de:
+  - BoxFit.cover
+  - BoxFit.contain
+
+---
+
+### 7. REGLAS IMPORTANTES
+
+- NO elimines funcionalidades existentes
+- NO cambies lógica de negocio
+- NO rompas navegación actual
+- Mantén compatibilidad total con el backend existente
+- Explica cada cambio antes de aplicarlo
+
+---
+
+### 8. FORMATO DE RESPUESTA
+
+Para cada problema encontrado:
+
+1. Problema detectado
+2. Causa
+3. Archivo y ubicación
+4. Solución propuesta
+5. Código corregido
+
+---
+
+### OBJETIVO FINAL
+
+Dejar la app:
+- Sin overflows
+- Responsive en cualquier dispositivo
+- Con navegación completa y correcta
+- Con UI limpia, consistente y profesional
+
+---
+
+Ahora analiza TODO el proyecto y dame un informe detallado con mejoras aplicables.
