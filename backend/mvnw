@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ -n "$MAVEN_HOME" ]; then
+  MVN_CMD="$MAVEN_HOME/bin/mvn"
+elif [ -x "/usr/bin/mvn" ]; then
+  MVN_CMD="/usr/bin/mvn"
+else
+  MVN_CMD="mvn"
+fi
+
+exec "$MVN_CMD" "$@"

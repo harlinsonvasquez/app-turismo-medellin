@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:turismo_db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    show-sql: true
+  flyway:
+    clean-disabled: true
+
+app:
+  # Development-only permissive CORS for local Flutter runs.
+  cors:
+    allowed-origin-patterns:
+      - http://localhost:*
+      - http://127.0.0.1:*
+      - http://192.168.1.*:*
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - PATCH
+      - DELETE
+      - OPTIONS
+    allowed-headers:
+      - '*'
+    exposed-headers:
+      - Authorization
+      - Content-Type
+    allow-credentials: true
+    max-age-seconds: 3600
