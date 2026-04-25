@@ -69,36 +69,46 @@ public class ItineraryServiceImpl implements ItineraryService {
                 .toList();
 
         if (cityPlaces.isEmpty() && cityEvents.isEmpty()) {
-            throw new BadRequestException("There is not enough catalog data to generate an itinerary for the requested city");
+            throw new BadRequestException(
+                    "There is not enough catalog data to generate an itinerary for the requested city");
         }
 
-        BigDecimal dailyBudget = request.totalBudget().divide(BigDecimal.valueOf(request.totalDays()), 2, RoundingMode.HALF_UP);
+        BigDecimal dailyBudget = request.totalBudget().divide(BigDecimal.valueOf(request.totalDays()), 2,
+                RoundingMode.HALF_UP);
         List<ItineraryItemResponse> items = new ArrayList<>();
         Set<UUID> usedReferences = new HashSet<>();
         int sortSeed = 0;
 
         for (int day = 1; day <= request.totalDays(); day++) {
-            Place morningPlace = choosePlace(cityPlaces, usedReferences, dailyBudget, request.interests(), List.of(PlaceCategory.TOURIST_PLACE, PlaceCategory.EXPERIENCE, PlaceCategory.TOWN));
+            Place morningPlace = choosePlace(cityPlaces, usedReferences, dailyBudget, request.interests(),
+                    List.of(PlaceCategory.TOURIST_PLACE, PlaceCategory.EXPERIENCE, PlaceCategory.TOWN));
             if (morningPlace != null) {
-                items.add(toGeneratedItem(day, ItineraryPeriod.MORNING, inferItemType(morningPlace), morningPlace.getId(), morningPlace.getName(), defaultCost(morningPlace), sortSeed++));
+                items.add(toGeneratedItem(day, ItineraryPeriod.MORNING, inferItemType(morningPlace),
+                        morningPlace.getId(), morningPlace.getName(), defaultCost(morningPlace), sortSeed++));
                 usedReferences.add(morningPlace.getId());
             }
 
             Event afternoonEvent = chooseEvent(cityEvents, usedReferences, dailyBudget);
             if (afternoonEvent != null && day % 2 == 0) {
-                items.add(toGeneratedItem(day, ItineraryPeriod.AFTERNOON, ItineraryItemType.EVENT, afternoonEvent.getId(), afternoonEvent.getTitle(), afternoonEvent.getAveragePrice(), sortSeed++));
+                items.add(
+                        toGeneratedItem(day, ItineraryPeriod.AFTERNOON, ItineraryItemType.EVENT, afternoonEvent.getId(),
+                                afternoonEvent.getTitle(), afternoonEvent.getAveragePrice(), sortSeed++));
                 usedReferences.add(afternoonEvent.getId());
             } else {
-                Place afternoonPlace = choosePlace(cityPlaces, usedReferences, dailyBudget, request.interests(), List.of(PlaceCategory.TOURIST_PLACE, PlaceCategory.EXPERIENCE, PlaceCategory.TOWN, PlaceCategory.TRANSPORT));
+                Place afternoonPlace = choosePlace(cityPlaces, usedReferences, dailyBudget, request.interests(),
+                        List.of(PlaceCategory.TOURIST_PLACE, PlaceCategory.EXPERIENCE, PlaceCategory.TOWN,
+                                PlaceCategory.TRANSPORT));
                 if (afternoonPlace != null) {
-                    items.add(toGeneratedItem(day, ItineraryPeriod.AFTERNOON, inferItemType(afternoonPlace), afternoonPlace.getId(), afternoonPlace.getName(), defaultCost(afternoonPlace), sortSeed++));
+                    items.add(toGeneratedItem(day, ItineraryPeriod.AFTERNOON, inferItemType(afternoonPlace),
+                            afternoonPlace.getId(), afternoonPlace.getName(), defaultCost(afternoonPlace), sortSeed++));
                     usedReferences.add(afternoonPlace.getId());
                 }
             }
 
             Place nightPlace = chooseNightPlace(cityPlaces, usedReferences, dailyBudget, request.travelStyle());
             if (nightPlace != null) {
-                items.add(toGeneratedItem(day, ItineraryPeriod.NIGHT, inferItemType(nightPlace), nightPlace.getId(), nightPlace.getName(), defaultCost(nightPlace), sortSeed++));
+                items.add(toGeneratedItem(day, ItineraryPeriod.NIGHT, inferItemType(nightPlace), nightPlace.getId(),
+                        nightPlace.getName(), defaultCost(nightPlace), sortSeed++));
                 usedReferences.add(nightPlace.getId());
             }
         }
@@ -106,7 +116,8 @@ public class ItineraryServiceImpl implements ItineraryService {
         List<SafetyTip> tips = safetyTipRepository.findByCityIgnoreCaseAndActiveTrue(request.city());
         if (!tips.isEmpty()) {
             SafetyTip tip = tips.stream().min(Comparator.comparing(SafetyTip::getCreatedAt)).orElse(tips.get(0));
-            items.add(new ItineraryItemResponse(null, 1, ItineraryPeriod.NIGHT, ItineraryItemType.SAFETY_NOTE, tip.getId(), tip.getTitle(), BigDecimal.ZERO, sortSeed));
+            items.add(new ItineraryItemResponse(null, 1, ItineraryPeriod.NIGHT, ItineraryItemType.SAFETY_NOTE,
+                    tip.getId(), tip.getTitle(), BigDecimal.ZERO, sortSeed));
         }
 
         return new ItineraryResponse(
@@ -122,8 +133,7 @@ public class ItineraryServiceImpl implements ItineraryService {
                 items,
                 null,
                 null,
-                true
-        );
+                true);
     }
 
     @Override
@@ -177,7 +187,8 @@ public class ItineraryServiceImpl implements ItineraryService {
         return toResponse(itinerary, false);
     }
 
-    private Place choosePlace(List<Place> places, Set<UUID> usedReferences, BigDecimal dailyBudget, List<String> interests, List<PlaceCategory> allowedCategories) {
+    private Place choosePlace(List<Place> places, Set<UUID> usedReferences, BigDecimal dailyBudget,
+            List<String> interests, List<PlaceCategory> allowedCategories) {
         return places.stream()
                 .filter(place -> !usedReferences.contains(place.getId()))
                 .filter(place -> allowedCategories.contains(place.getCategory()))
@@ -200,7 +211,8 @@ public class ItineraryServiceImpl implements ItineraryService {
                 .orElse(null);
     }
 
-    private Place chooseNightPlace(List<Place> places, Set<UUID> usedReferences, BigDecimal dailyBudget, TravelStyle style) {
+    private Place chooseNightPlace(List<Place> places, Set<UUID> usedReferences, BigDecimal dailyBudget,
+            TravelStyle style) {
         List<PlaceCategory> categories = style == TravelStyle.NIGHTLIFE
                 ? List.of(PlaceCategory.NIGHTLIFE, PlaceCategory.RESTAURANT)
                 : List.of(PlaceCategory.RESTAURANT, PlaceCategory.NIGHTLIFE, PlaceCategory.HOTEL);
@@ -243,11 +255,13 @@ public class ItineraryServiceImpl implements ItineraryService {
             return true;
         }
         String subcategory = place.getSubcategory() == null ? "" : place.getSubcategory();
-        String haystack = (place.getCategory().name() + " " + subcategory + " " + place.getDescription()).toLowerCase(Locale.ROOT);
+        String haystack = (place.getCategory().name() + " " + subcategory + " " + place.getDescription())
+                .toLowerCase(Locale.ROOT);
         return interests.stream().map(value -> value.toLowerCase(Locale.ROOT)).anyMatch(haystack::contains);
     }
 
-    private ItineraryItemResponse toGeneratedItem(int day, ItineraryPeriod period, ItineraryItemType itemType, UUID referenceId, String title, BigDecimal estimatedCost, int sortOrder) {
+    private ItineraryItemResponse toGeneratedItem(int day, ItineraryPeriod period, ItineraryItemType itemType,
+            UUID referenceId, String title, BigDecimal estimatedCost, int sortOrder) {
         return new ItineraryItemResponse(null, day, period, itemType, referenceId, title, estimatedCost, sortOrder);
     }
 
@@ -265,8 +279,7 @@ public class ItineraryServiceImpl implements ItineraryService {
                 itinerary.getItems().stream().map(this::toItemResponse).toList(),
                 itinerary.getCreatedAt(),
                 itinerary.getUpdatedAt(),
-                generated
-        );
+                generated);
     }
 
     private ItineraryItemResponse toItemResponse(ItineraryItem item) {
@@ -278,8 +291,7 @@ public class ItineraryServiceImpl implements ItineraryService {
                 item.getReferenceId(),
                 item.getTitle(),
                 item.getEstimatedCost(),
-                item.getSortOrder()
-        );
+                item.getSortOrder());
     }
 
     private String writeJson(List<String> values) {
