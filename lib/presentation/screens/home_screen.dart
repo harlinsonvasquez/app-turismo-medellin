@@ -154,14 +154,14 @@ class _HomeScreenState extends State<HomeScreen> {
   SliverAppBar _buildAppBar(BuildContext context, AuthProvider auth) {
     final userName = auth.user?.name.split(' ').first ?? 'viajero';
     return SliverAppBar(
-      expandedHeight: 160, // Incrementado para evitar el overflow del encabezado en pantallas pequeñas al crecer el texto
+      expandedHeight: 180, // Incrementado para evitar overflow cuando el texto es largo
       floating: true,
       snap: true,
       backgroundColor: AppColors.background,
       elevation: 0,
       actions: [
         IconButton(
-          onPressed: () => context.go(AppConstants.routeSaved),
+          onPressed: () => context.push(AppConstants.routeSaved),
           icon: const Icon(Icons.bookmark_outline_rounded, color: Colors.white),
         ),
       ],
@@ -341,12 +341,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final places = placeProvider.featuredPlaces.isNotEmpty
         ? placeProvider.featuredPlaces
         : placeProvider.places.take(5).toList();
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isSmallScreen = screenHeight < 640;
-    final cardHeight = isSmallScreen ? 240.0 : AppConstants.placeCardHeight;
 
     return SizedBox(
-      height: cardHeight + 10,
+      height: 260, // Altura ajustada para tarjetas verticales compactas
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
@@ -356,7 +353,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: PlaceCard(
               place: places[i],
               onTap: () => context
-                  .go('${AppConstants.routePlaceDetail}?id=${places[i].id}')),
+                  .push('${AppConstants.routePlaceDetail}?id=${places[i].id}')),
         ),
       ),
     );
@@ -375,7 +372,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
     return SizedBox(
-      height: 240, // Altura base incrementada para compensar flex logs y evitar Bottom Overflowed by 18 pixels
+      height: 260, // Altura incrementada para evitar overflow en tarjetas de eventos
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
@@ -390,7 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildBudgetPlans(BuildContext context) {
     return SizedBox(
-      height: 220, // Incrementado vs 170 original para evitar escapes y BOTTOM OVERFLOWED BY 12 PIXELS
+      height: 340, // Altura incrementada para evitar overflow en tarjeta Plan Familiar
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
@@ -398,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(
               width: 280,
               child: BudgetPlanCard(
-                  emoji: '??',
+                  emoji: '',
                   title: 'Mochilero Paisa',
                   budget: '\$250.000',
                   days: '3',
@@ -408,7 +405,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(
               width: 280,
               child: BudgetPlanCard(
-                  emoji: '??',
+                  emoji: '',
                   title: 'Escapada Romantica',
                   budget: '\$800.000',
                   days: '2',
@@ -418,7 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(
               width: 280,
               child: BudgetPlanCard(
-                  emoji: '???????????',
+                  emoji: '',
                   title: 'Plan Familiar',
                   budget: '\$600.000',
                   days: '4',
@@ -439,7 +436,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 place: place,
                 isHorizontal: true,
                 onTap: () => context
-                    .go('${AppConstants.routePlaceDetail}?id=${place.id}')))
+                    .push('${AppConstants.routePlaceDetail}?id=${place.id}')))
             .toList(),
       ),
     );
@@ -449,12 +446,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final places = placeProvider.nearbyPlaces.isNotEmpty
         ? placeProvider.nearbyPlaces
         : placeProvider.places.take(3).toList();
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isSmallScreen = screenHeight < 640;
-    final cardHeight = isSmallScreen ? 240.0 : AppConstants.placeCardHeight;
 
     return SizedBox(
-      height: cardHeight + 10,
+      height: 260, // Altura ajustada para tarjetas verticales compactas
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
@@ -464,7 +458,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: PlaceCard(
               place: places[i],
               onTap: () => context
-                  .go('${AppConstants.routePlaceDetail}?id=${places[i].id}')),
+                  .push('${AppConstants.routePlaceDetail}?id=${places[i].id}')),
         ),
       ),
     );

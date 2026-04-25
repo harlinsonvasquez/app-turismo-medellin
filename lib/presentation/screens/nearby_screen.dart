@@ -45,7 +45,13 @@ class _NearbyScreenState extends State<NearbyScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Cerca de mi')),
+      appBar: AppBar(
+        title: const Text('Cerca de mi'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => context.go(AppConstants.routeHome),
+        ),
+      ),
       body: Column(
         children: [
           Container(
@@ -178,7 +184,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                     itemBuilder: (_, i) => PlaceCard(
                         place: places[i],
                         isHorizontal: true,
-                        onTap: () => context.go(
+                        onTap: () => context.push(
                             '${AppConstants.routePlaceDetail}?id=${places[i].id}')),
                   ),
           ),

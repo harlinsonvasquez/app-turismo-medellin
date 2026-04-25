@@ -43,7 +43,13 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Planear mi viaje')),
+      appBar: AppBar(
+        title: const Text('Planear mi viaje'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => context.go(AppConstants.routeHome),
+        ),
+      ),
       body: Column(
         children: [
           Expanded(
@@ -199,7 +205,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                           ),
                         );
                 if (!mounted) return;
-                if (plan != null) context.go(AppConstants.routeGeneratedPlan);
+                if (plan != null) context.push(AppConstants.routeGeneratedPlan);
               },
             ),
           ),

@@ -98,13 +98,13 @@ class ProfileScreen extends StatelessWidget {
                               Expanded(
                                   child: ElevatedButton(
                                       onPressed: () =>
-                                          context.go(AppConstants.routeLogin),
+                                          context.push(AppConstants.routeLogin),
                                       child: const Text('Iniciar sesion'))),
                               const SizedBox(width: 12),
                               Expanded(
                                   child: OutlinedButton(
                                       onPressed: () => context
-                                          .go(AppConstants.routeRegister),
+                                          .push(AppConstants.routeRegister),
                                       child: const Text('Crear cuenta'))),
                             ],
                           ),
@@ -130,16 +130,16 @@ class ProfileScreen extends StatelessWidget {
                       _SettingsTile(
                           icon: '??',
                           title: 'Mis guardados',
-                          onTap: () => context.go(AppConstants.routeSaved)),
+                          onTap: () => context.push(AppConstants.routeSaved)),
                       _SettingsTile(
                           icon: '???',
                           title: 'Consejos de seguridad',
-                          onTap: () => context.go(AppConstants.routeSafety)),
+                          onTap: () => context.push(AppConstants.routeSafety)),
                       _SettingsTile(
                           icon: '??',
                           title: 'Promover mi negocio',
                           onTap: () =>
-                              context.go(AppConstants.routeBusinessPromo)),
+                              context.push(AppConstants.routeBusinessPromo)),
                       _SettingsTile(
                         icon: '??',
                         title: 'Cerrar sesion',

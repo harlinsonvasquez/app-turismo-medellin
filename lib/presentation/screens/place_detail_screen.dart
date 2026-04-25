@@ -83,7 +83,7 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                   GestureDetector(
                     onTap: () async {
                       if (!authProvider.isAuthenticated) {
-                        context.go(AppConstants.routeLogin);
+                        context.push(AppConstants.routeLogin);
                         return;
                       }
                       await favoritesProvider.alternarFavorito(
@@ -250,7 +250,7 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                               padding: const EdgeInsets.only(right: 14),
                               child: PlaceCard(
                                   place: relatedPlaces[i],
-                                  onTap: () => context.go(
+                                  onTap: () => context.push(
                                       '${AppConstants.routePlaceDetail}?id=${relatedPlaces[i].id}')),
                             ),
                           ),

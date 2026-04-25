@@ -50,7 +50,7 @@ class PlaceCard extends StatelessWidget {
             Stack(
               children: [
                 SizedBox(
-                  height: 160,
+                  height: 150,
                   width: double.infinity,
                   child: ImagenTuristica(
                     imageUrl: place.imagenPrincipalUrl,
@@ -61,11 +61,11 @@ class PlaceCard extends StatelessWidget {
                 // Safety badge
                 if (place.safetyLevel == SafetyLevel.safe)
                   Positioned(
-                    top: 10,
-                    right: 10,
+                    top: 8,
+                    right: 8,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                          horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
                         color: AppColors.safeZone,
                         borderRadius:
@@ -75,7 +75,7 @@ class PlaceCard extends StatelessWidget {
                         '✓ Seguro',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 10,
+                          fontSize: 9,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -83,11 +83,11 @@ class PlaceCard extends StatelessWidget {
                   ),
                 // Category chip
                 Positioned(
-                  top: 10,
-                  left: 10,
+                  top: 8,
+                  left: 8,
                   child: Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius:
@@ -97,7 +97,7 @@ class PlaceCard extends StatelessWidget {
                       place.categoryLabel,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 10,
+                        fontSize: 9,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -106,9 +106,9 @@ class PlaceCard extends StatelessWidget {
               ],
             ),
             // Content
-            Expanded( // Se envuelve en Expanded para evitar overflow vertical en la tarjeta
+            Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -117,57 +117,69 @@ class PlaceCard extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
+                            fontSize: 14,
                           ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
                     Row(
                       children: [
                         const Icon(Icons.star_rounded,
-                            size: 14, color: AppColors.accent),
-                        const SizedBox(width: 3),
+                            size: 13, color: AppColors.accent),
+                        const SizedBox(width: 2),
                         Text(
                           place.rating.toStringAsFixed(1),
                           style: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 11,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
                         ),
-                        Text(
-                          ' (${place.reviewCount})',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textTertiary,
+                        Flexible(
+                          child: Text(
+                            ' (${place.reviewCount})',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: AppColors.textTertiary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
-                    const Spacer(), // Se asegura de que el precio y distancia bajen
+                    const Spacer(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.location_on_outlined,
-                                size: 13, color: AppColors.textTertiary),
-                            const SizedBox(width: 2),
-                            Text(
-                              '${place.distanceKm.toStringAsFixed(1)} km',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: AppColors.textTertiary,
+                        Flexible(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.location_on_outlined,
+                                  size: 11, color: AppColors.textTertiary),
+                              const SizedBox(width: 2),
+                              Flexible(
+                                child: Text(
+                                  '${place.distanceKm.toStringAsFixed(1)} km',
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: AppColors.textTertiary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         Text(
                           place.pricePerPerson == 0
                               ? 'Gratis'
                               : place.formattedPrice,
                           style: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 11,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
                           ),
@@ -219,6 +231,7 @@ class PlaceCard extends StatelessWidget {
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
                       children: [
@@ -277,9 +290,11 @@ class PlaceCard extends StatelessWidget {
                     Text(
                       place.neighborhood,
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 11,
                         color: AppColors.textTertiary,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
                     Row(
@@ -299,7 +314,7 @@ class PlaceCard extends StatelessWidget {
                         Text(
                           ' ${place.distanceKm.toStringAsFixed(1)} km',
                           style: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 11,
                             color: AppColors.textTertiary,
                           ),
                         ),

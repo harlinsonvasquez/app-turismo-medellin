@@ -226,7 +226,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           place: places[i],
           isHorizontal: true,
           onTap: () => context
-              .go('${AppConstants.routePlaceDetail}?id=${places[i].id}')),
+              .push('${AppConstants.routePlaceDetail}?id=${places[i].id}')),
     );
   }
 
@@ -252,7 +252,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       itemBuilder: (_, i) => PlaceCard(
           place: places[i],
           onTap: () => context
-              .go('${AppConstants.routePlaceDetail}?id=${places[i].id}')),
+              .push('${AppConstants.routePlaceDetail}?id=${places[i].id}')),
     );
   }
 

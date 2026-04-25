@@ -63,7 +63,7 @@ class _SavedPageState extends State<SavedPage>
                     'Tus favoritos e itinerarios guardados viven ahora en el backend.'),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                    onPressed: () => context.go(AppConstants.routeLogin),
+                    onPressed: () => context.push(AppConstants.routeLogin),
                     child: const Text('Iniciar sesion')),
               ],
             ),
@@ -176,7 +176,7 @@ class _SavedPageState extends State<SavedPage>
                                   .read<ItineraryProvider>()
                                   .cargarPlan(plan.id);
                               if (mounted)
-                                context.go(AppConstants.routeGeneratedPlan);
+                                  context.push(AppConstants.routeGeneratedPlan);
                             },
                           ),
                         );

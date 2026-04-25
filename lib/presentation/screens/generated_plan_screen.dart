@@ -169,7 +169,7 @@ class _GeneratedPlanScreenState extends State<GeneratedPlanScreen> {
               child: ElevatedButton.icon(
                 onPressed: () async {
                   if (!auth.isAuthenticated) {
-                    context.go(AppConstants.routeLogin);
+                    context.push(AppConstants.routeLogin);
                     return;
                   }
                   final saved = await context

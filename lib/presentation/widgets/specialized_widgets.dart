@@ -280,11 +280,11 @@ class BudgetPlanCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(emoji, style: const TextStyle(fontSize: 32)),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -309,32 +309,36 @@ class BudgetPlanCard extends StatelessWidget {
               title,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 18,
+                fontSize: 17,
                 fontWeight: FontWeight.w700,
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
-            Flexible(
-              child: Text(
-                description,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
-                  fontSize: 12,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+            Text(
+              description,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.8),
+                fontSize: 11,
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  budget,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
+                Flexible(
+                  child: Text(
+                    budget,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Container(

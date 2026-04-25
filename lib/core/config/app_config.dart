@@ -5,7 +5,7 @@ class ConfiguracionApi {
   static const _apiBaseUrlOverride = String.fromEnvironment('API_BASE_URL');
 
   /// IP de tu PC en la red local - cambia esto si tu IP cambia
-  static const String _pcLocalIp = '192.168.1.4';
+  static const String _pcLocalIp = '192.168.1.3';
   static const String _backendPort = '8080';
 
   static String get apiBaseUrl {

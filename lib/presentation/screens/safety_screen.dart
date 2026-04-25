@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'package:app_turismo/core/constants/app_constants.dart';
@@ -38,7 +39,13 @@ class _SafetyScreenState extends State<SafetyScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Seguridad para turistas')),
+      appBar: AppBar(
+        title: const Text('Seguridad para turistas'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => context.pop(),
+        ),
+      ),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(

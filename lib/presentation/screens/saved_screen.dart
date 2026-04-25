@@ -66,7 +66,7 @@ class _SavedScreenState extends State<SavedScreen>
                     'Tus favoritos e itinerarios guardados viven ahora en el backend.'),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                    onPressed: () => context.go(AppConstants.routeLogin),
+                    onPressed: () => context.push(AppConstants.routeLogin),
                     child: const Text('Iniciar sesion')),
               ],
             ),
@@ -79,6 +79,11 @@ class _SavedScreenState extends State<SavedScreen>
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Guardados'),
+        leading: IconButton(
+          icon: const Icon(Icons.home_outlined),
+          onPressed: () => context.go('/'),
+          tooltip: 'Ir al inicio',
+        ),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [Tab(text: 'Lugares'), Tab(text: 'Itinerarios')],
@@ -179,7 +184,7 @@ class _SavedScreenState extends State<SavedScreen>
                                   .read<ItineraryProvider>()
                                   .cargarPlan(plan.id);
                               if (mounted)
-                                context.go(AppConstants.routeGeneratedPlan);
+                                context.push(AppConstants.routeGeneratedPlan);
                             },
                           ),
                         );

@@ -18,7 +18,7 @@ class EventCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: 240,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(AppConstants.radiusL),
@@ -32,9 +32,10 @@ class EventCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: AppColors.accent.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(AppConstants.radiusFull),
@@ -42,52 +43,51 @@ class EventCard extends StatelessWidget {
               child: Text(
                 event.categoryLabel,
                 style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: AppColors.accent),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             Text(
               event.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary),
             ),
-            const SizedBox(height: 8),
-            Flexible(
-              child: Text(
-                event.address,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style:
-                    const TextStyle(fontSize: 13, color: AppColors.textSecondary),
-              ),
+            const SizedBox(height: 6),
+            Text(
+              event.address,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style:
+                  const TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
+            const SizedBox(height: 6),
             Row(
               children: [
                 const Icon(Icons.event_rounded,
-                    size: 16, color: AppColors.primary),
+                    size: 14, color: AppColors.primary),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
                     '${event.startDate.day}/${event.startDate.month} - ${event.city}',
                     style: const TextStyle(
-                        fontSize: 12, color: AppColors.textSecondary),
+                        fontSize: 11, color: AppColors.textSecondary),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               event.averagePrice == 0
                   ? 'Gratis'
                   : '\$${event.averagePrice} COP',
               style: const TextStyle(
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: FontWeight.w800,
                   color: AppColors.primary),
             ),
